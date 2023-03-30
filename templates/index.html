@@ -3,27 +3,143 @@
 <head>
   <title>Google Maps Web App</title>
   <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+
+
   <script>
-    function initMap() {
-      var map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -34.397, lng: 150.644},
-        zoom: 8
-      });
+    let map;
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: -34.397, lng: 150.644 },
+    zoom: 8,
+  });
+
+  google.maps.event.addListener(map, "zoom_changed", () => {
+    if (map.getZoom() >= 15) {
+      populateTableWithVisibleStreets();
+    } else {
+      clearTable();
     }
+  });
+  // Add this event listener for the bounds_changed event
+  google.maps.event.addListener(map, "bounds_changed", () => {
+    if (map.getZoom() >= 15) {
+      populateTableWithVisibleStreets();
+    } else {
+      clearTable();
+    }
+  });
+}
+
+function populateTableWithVisibleStreets() {
+  const bounds = map.getBounds();
+  const northEast = bounds.getNorthEast();
+  const southWest = bounds.getSouthWest();
+
+  const overpassQuery = `
+    [out:json][timeout:25];
+    (
+      way[highway][name](${southWest.lat()},${southWest.lng()},${northEast.lat()},${northEast.lng()});
+    );
+    out body;
+  `;
+
+  const overpassApiUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery.trim())}`;
+
+  fetch(overpassApiUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      const streetNames = data.elements
+        .filter((element) => element.tags && element.tags.name)
+        .map((element) => element.tags.name);
+      const uniqueStreetNames = [...new Set(streetNames)];
+      populateTable(uniqueStreetNames);
+    })
+    .catch((error) => {
+      console.error('Error fetching street names:', error);
+    });
+}
+
+
+function populateTable(streetNames) {
+  const table = document.getElementById("info-table");
+
+  // Clear the table before populating it
+  while (table.rows.length > 1) {
+    table.deleteRow(1);
+  }
+
+  streetNames.forEach((streetName) => {
+    const row = table.insertRow();
+    const cell1 = row.insertCell();
+    cell1.textContent = streetName;
+  });
+}
+
+function clearTable() {
+  const table = document.getElementById("info-table");
+
+  if (table) {
+    // Clear the table
+    while (table.rows.length > 1) {
+      table.deleteRow(1);
+    }
+  }
+}
+
+
   </script>
   <style>
-    #map {
-      height: 100%;
-    }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-  </style>
+  #map {
+    height: 100%;
+    width: 70%;
+    float: left;
+    box-sizing: border-box; /* Add this line */
+  }
+
+  #info-table-container {
+    height: 100%;
+    width: 30%;
+    float: right;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    padding: 20px;
+    box-sizing: border-box; /* Add this line */
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+</style>
+
 </head>
 <body onload="initMap()">
   <div id="map"></div>
+  <div id="info-table-container">
+     <table id="info-table">
+    <tr>
+      <th>Name</th>
+    </tr>
+    <!-- The table rows will be added dynamically -->
+  </table>
+
+  </div>
 </body>
 </html>
