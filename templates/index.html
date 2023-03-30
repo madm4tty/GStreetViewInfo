@@ -7,6 +7,7 @@
 
   <script>
     let map;
+    let debounceTimer;
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -14,21 +15,28 @@ function initMap() {
     zoom: 8,
   });
 
-  google.maps.event.addListener(map, "zoom_changed", () => {
+google.maps.event.addListener(map, "zoom_changed", () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
     if (map.getZoom() >= 15) {
       populateTableWithVisibleStreets();
     } else {
       clearTable();
     }
-  });
-  // Add this event listener for the bounds_changed event
-  google.maps.event.addListener(map, "bounds_changed", () => {
+  }, 1000); // Adjust the debounce time in milliseconds as needed
+});
+
+google.maps.event.addListener(map, "bounds_changed", () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
     if (map.getZoom() >= 15) {
       populateTableWithVisibleStreets();
     } else {
       clearTable();
     }
-  });
+  }, 1000); // Adjust the debounce time in milliseconds as needed
+});
+
 }
 
 function populateTableWithVisibleStreets() {
@@ -84,8 +92,16 @@ function clearTable() {
     while (table.rows.length > 1) {
       table.deleteRow(1);
     }
+
+    // Add a message when zoom level is below 15
+    const row = table.insertRow();
+    const cell = row.insertCell();
+    cell.textContent = "Zoom in to see Streetview data";
+    cell.colSpan = 2; // Span the message across both columns
+    cell.style.textAlign = "center";
   }
 }
+
 
 
   </script>
