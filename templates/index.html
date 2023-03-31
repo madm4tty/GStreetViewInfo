@@ -2,6 +2,8 @@
 <html>
 <head>
   <title>Google Streetview Dates</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
   <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 
 
@@ -207,10 +209,15 @@ async function fetchStreets(center, radius) {
     padding: 0;
   }
 
+  body {
+      font-family: 'Roboto', sans-serif;
+    }
+    
   #map {
     height: 70%;
     width: 70%;
     float: left;
+    border: 2px solid #dddddd;
     box-sizing: border-box;
   }
 
@@ -219,7 +226,8 @@ async function fetchStreets(center, radius) {
     width: 30%;
     float: right;
     overflow-y: auto;
-    background-color: #f8f9fa;
+    
+    background-color: #ECEFF1;
     box-sizing: border-box;
   }
 
@@ -227,10 +235,10 @@ async function fetchStreets(center, radius) {
     width: 100%;
     padding: 20px;
     text-align: left;
-    background-color: #f8f9fa;
-    font-size: 24px;
+    background-color: #ECEFF1;
+    font-size: 30px;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     box-sizing: border-box;
   }
 
@@ -249,16 +257,18 @@ async function fetchStreets(center, radius) {
   table {
     border-collapse: collapse;
     width: 100%;
+    
   }
 
   th, td {
-    border: 1px solid #dddddd;
+    border: 2px solid #dddddd;
     text-align: left;
     padding: 8px;
+    background-color: #CFD8DC
   }
 
   th {
-    background-color: #f2f2f2;
+    background-color: #CFD8DC;
   }
 </style>
 
