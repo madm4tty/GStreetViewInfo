@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Google Maps Web App</title>
+  <title>Google Streetview Dates</title>
   <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 
 
@@ -201,28 +201,50 @@ async function fetchStreets(center, radius) {
 
   </script>
   <style>
-  html, body {
+   html, body {
     height: 100%;
     margin: 0;
     padding: 0;
   }
 
   #map {
-    height: 100%;
+    height: 70%;
     width: 70%;
     float: left;
-    box-sizing: border-box; /* Add this line */
+    box-sizing: border-box;
   }
 
   #info-table-container {
-    height: 100%;
+    height: 70%;
     width: 30%;
     float: right;
     overflow-y: auto;
     background-color: #f8f9fa;
-    padding: 20px;
-    box-sizing: border-box; /* Add this line */
+    box-sizing: border-box;
   }
+
+  #header {
+    width: 100%;
+    padding: 20px;
+    text-align: left;
+    background-color: #f8f9fa;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+
+  #description {
+    width: 100%;
+    padding: 20px;
+    text-align: left;
+    background-color: #f8f9fa;
+    font-size: 16px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+
 
   table {
     border-collapse: collapse;
@@ -242,16 +264,33 @@ async function fetchStreets(center, radius) {
 
 </head>
 <body onload="initMap()">
+  <div id="header">Google Streetview Dates Viewer</div>
   <div id="map"></div>
   <div id="info-table-container">
-     <table id="info-table">
-    <tr>
-      <th>Name</th>
-      <th>Image Date</th>
-    </tr>
-    <!-- The table rows will be added dynamically -->
-  </table>
-
-  </div>
-</body>
-</html>
+		<table id="info-table">
+  <tr>
+    <th>Name</th>
+    <th>Date</th>
+  </tr>
+  <!-- The table rows will be added dynamically -->
+	</table>
+	  </div>
+  
+  <div id="description">
+    <p></p>
+      <h3>Description</h3>
+      <p>
+        The Google Maps Street View Image Date Web App is an interactive mapping application that displays street names in a specific area on the map and their corresponding latest Street View image date. The app allows users to zoom in and out of the map to explore different locations and obtain street-level imagery information. When the user zooms in at a certain level (zoom level 15 or higher), the app populates a table with visible street names and their latest Street View image date. Users can also click on the street name in the table to place a marker on the map, indicating the street's location.
+      </p>
+      <h3>How to use:</h3>
+      <ol>
+        <li>Open the web app in your browser. You will see a Google Map view on the left side of the screen and an initially empty data table on the right side.</li>
+        <li>Use the mouse to navigate and scroll to zoom in and out of the map. When you reach zoom level 15 or higher, the app will automatically populate the data table with the visible street names and their latest Street View image date.</li>
+        <li>If there is no Street View imagery available for a specific street, the table will display "No imagery here" in the date column.</li>
+        <li>To view the location of a particular street on the map, click on the street name in the data table. A marker will appear on the map, indicating the street's location.</li>
+        <li>To clear the table and remove all markers from the map, zoom out to a level below 15. The table will display a message "Zoom in to see Street View data" indicating that you need to zoom in further to access Street Viewimage dates.</li>
+		<li>Explore different areas by panning and zooming the map. The data table will update automatically as you navigate, providing Street View image dates for streets in the visible area.</li>
+		</ol>
+		</div>
+	</body>
+	</html>
