@@ -127,6 +127,8 @@ async function populateRowWithStreetViewImageDate(row, streetName) {
         const cell2 = row.insertCell(1);
         cell2.textContent = imageDate;
       } else {
+        const cell2 = row.insertCell(1);
+        cell2.textContent = 'No imagery here';
         console.error(`Error fetching Street View image date for ${streetName}: ${status}`);
       }
     });
@@ -134,6 +136,7 @@ async function populateRowWithStreetViewImageDate(row, streetName) {
     console.error(`Error fetching Street View image date for ${streetName}:`, error);
   }
 }
+
 
 
 async function geocodeStreet(streetName, apiKey) {
