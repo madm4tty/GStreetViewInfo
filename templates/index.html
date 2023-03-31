@@ -70,7 +70,7 @@ function populateTableWithVisibleStreets() {
 }
 
 
-function populateTable(streetNames, apiKey) {
+function populateTable(streetNames) {
   const table = document.getElementById("info-table");
 
   // Clear the table before populating it
@@ -78,15 +78,41 @@ function populateTable(streetNames, apiKey) {
     table.deleteRow(1);
   }
 
-  streetNames.forEach((streetName) => {
+  streetNames.forEach(async (streetName) => {
     const row = table.insertRow();
     const cell1 = row.insertCell();
     cell1.textContent = streetName;
 
-    // Pass the entire `row` instead of `cell1` as the first argument
-    populateRowWithStreetViewImageDate(row, streetName, apiKey);
+    cell1.style.cursor = "pointer"; // Change cursor to pointer when hovering over the street name
+
+    cell1.addEventListener("click", async () => {
+      try {
+        const streetLatLng = await geocodeStreet(streetName);
+        const latLng = new google.maps.LatLng(streetLatLng.lat, streetLatLng.lng);
+
+        // Remove existing marker if any
+        if (window.streetMarker) {
+          window.streetMarker.setMap(null);
+        }
+
+        // Create and place a new marker on the map
+        window.streetMarker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+        });
+
+        // Center the map on the marker
+        map.setCenter(latLng);
+      } catch (error) {
+        console.error(`Error placing marker for ${streetName}:`, error);
+      }
+    });
+
+    // Fetch and display the Street View image date
+    await populateRowWithStreetViewImageDate(row, streetName);
   });
 }
+
 
 
 async function populateRowWithStreetViewImageDate(row, streetName) {
