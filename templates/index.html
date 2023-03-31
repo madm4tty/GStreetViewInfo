@@ -23,7 +23,7 @@ google.maps.event.addListener(map, "zoom_changed", () => {
     } else {
       clearTable();
     }
-  }, 1000); // Adjust the debounce time in milliseconds as needed
+  }, 1500); // Adjust the debounce time in milliseconds as needed
 });
 
 google.maps.event.addListener(map, "bounds_changed", () => {
@@ -34,7 +34,7 @@ google.maps.event.addListener(map, "bounds_changed", () => {
     } else {
       clearTable();
     }
-  }, 1000); // Adjust the debounce time in milliseconds as needed
+  }, 1500); // Adjust the debounce time in milliseconds as needed
 });
 
 }
@@ -57,21 +57,20 @@ function populateTableWithVisibleStreets() {
   fetch(overpassApiUrl)
     .then((response) => response.json())
     .then((data) => {
-      const streets = data.elements
+      const streetNames = data.elements
         .filter((element) => element.tags && element.tags.name)
-        .map((element) => ({
-          name: element.tags.name,
-          nodes: element.nodes, // Store the street's nodes
-          id: element.id, // Store the street's ID
-        }));
-
-      const uniqueStreetNames = [...new Set(streets.map((street) => street.name))];
-      populateTable(uniqueStreetNames, streets, data);
+        .map((element) => element.tags.name);
+      const uniqueStreetNames = [...new Set(streetNames)];
+      populateTable(uniqueStreetNames, '{{ google_maps_api_key }}'); // Pass the API key as a string
     })
+    .catch((error) => {
+      console.error('Error fetching street names:', error);
+    });
+
 }
 
 
-function populateTable(streetNames, streets, data) {
+function populateTable(streetNames, apiKey) {
   const table = document.getElementById("info-table");
 
   // Clear the table before populating it
@@ -80,19 +79,58 @@ function populateTable(streetNames, streets, data) {
   }
 
   streetNames.forEach((streetName) => {
-    const street = streets.find((s) => s.name === streetName);
-    const midpoint = calculateStreetMidpoint(street, data);
-
     const row = table.insertRow();
     const cell1 = row.insertCell();
     cell1.textContent = streetName;
 
-    const cell2 = row.insertCell();
-    cell2.textContent = `${midpoint.lat.toFixed(6)}, ${midpoint.lng.toFixed(6)}`; // Display the midpoint coordinates
+    // Pass the entire `row` instead of `cell1` as the first argument
+    populateRowWithStreetViewImageDate(row, streetName, apiKey);
   });
 }
 
 
+async function populateRowWithStreetViewImageDate(row, streetName) {
+  try {
+    const streetLatLng = await geocodeStreet(streetName);
+    const latLng = new google.maps.LatLng(streetLatLng.lat, streetLatLng.lng);
+
+    const streetViewService = new google.maps.StreetViewService();
+    streetViewService.getPanoramaByLocation(latLng, 50, (data, status) => {
+      if (status === google.maps.StreetViewStatus.OK) {
+        const imageDate = data.imageDate;
+        const cell2 = row.insertCell(1);
+        cell2.textContent = imageDate;
+      } else {
+        console.error(`Error fetching Street View image date for ${streetName}: ${status}`);
+      }
+    });
+  } catch (error) {
+    console.error(`Error fetching Street View image date for ${streetName}:`, error);
+  }
+}
+
+
+async function geocodeStreet(streetName, apiKey) {
+  const geocoder = new google.maps.Geocoder();
+  const request = {
+    address: streetName,
+    bounds: map.getBounds(),
+  };
+
+  return new Promise((resolve, reject) => {
+    geocoder.geocode(request, (results, status) => {
+      if (status === "OK") {
+        const latLng = results[0].geometry.location;
+        resolve({ lat: latLng.lat(), lng: latLng.lng() });
+      } else {
+        reject(new Error(`Geocoding failed for ${streetName}: ${status}`));
+      }
+    });
+  });
+}
+
+
+    
 function clearTable() {
   const table = document.getElementById("info-table");
 
@@ -111,42 +149,26 @@ function clearTable() {
   }
 }
 
-function calculateStreetMidpoint(street, data) {
-  const nodes = street.nodes;
-  const totalNodes = nodes.length;
+async function fetchStreets(center, radius) {
+  const overpassApiUrl = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:25];(way[highway](around:${radius},${center.lat()},${center.lng()}));(._;>;);out body;`;
+  const response = await fetch(overpassApiUrl);
+  const data = await response.json();
+  const streets = data.elements.filter(element => element.type === "way");
+  const nodes = data.elements.filter(element => element.type === "node");
 
-  if (totalNodes === 0) {
-    return { lat: 0, lng: 0 };
-  }
+  const midPoints = streets.map(street => {
+    const streetNodes = street.nodes.map(nodeId => nodes.find(node => node.id === nodeId));
+    const midIndex = Math.floor((streetNodes.length - 1) / 2);
+    const midPoint = {
+      lat: streetNodes[midIndex].lat,
+      lon: streetNodes[midIndex].lon
+    };
+    return midPoint;
+  });
 
-  if (totalNodes === 1) {
-    const node = data.elements.find((element) => element.type === "node" && element.id === nodes[0]);
-    if (!node) {
-      console.error(`Node not found for ID ${nodes[0]}`);
-      return { lat: 0, lng: 0 };
-    }
-    return { lat: node.lat, lng: node.lon };
-  }
-
-  const middleNodeIndex = Math.floor(totalNodes / 2) - 1;
-  const node1 = data.elements.find((element) => element.type === "node" && element.id === nodes[middleNodeIndex]);
-  const node2 = data.elements.find((element) => element.type === "node" && element.id === nodes[middleNodeIndex + 1]);
-
-  if (!node1 || !node2) {
-    console.error(`Nodes not found for IDs ${nodes[middleNodeIndex]}, ${nodes[middleNodeIndex + 1]}`);
-    return { lat: 0, lng: 0 };
-  }
-
-  const midpoint = {
-    lat: (node1.lat + node2.lat) / 2,
-    lng: (node1.lon + node2.lon) / 2,
-  };
-
-  return midpoint;
+  console.log(midPoints);
 }
-
-
-
+    
 
   </script>
   <style>
@@ -196,6 +218,7 @@ function calculateStreetMidpoint(street, data) {
      <table id="info-table">
     <tr>
       <th>Name</th>
+      <th>Image Date</th>
     </tr>
     <!-- The table rows will be added dynamically -->
   </table>
