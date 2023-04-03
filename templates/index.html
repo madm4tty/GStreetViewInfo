@@ -17,33 +17,48 @@ function initMap() {
     zoom: 5,
   });
 
-// Display the initial zoom level
+  // Display the initial zoom level
   updateZoomLevelIndicator();
 
   
-google.maps.event.addListener(map, "zoom_changed", () => {
-  updateZoomLevelIndicator(); //Update zoom level indicator
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    if (map.getZoom() >= 15) {
-      populateTableWithVisibleStreets();
-    } else {
-      clearTable();
-    }
-  }, 1500); // Adjust the debounce time in milliseconds as needed
-});
+  google.maps.event.addListener(map, "zoom_changed", () => {
+    updateZoomLevelIndicator(); //Update zoom level indicator
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (map.getZoom() >= 15) {
+        populateTableWithVisibleStreets();
+      } else {
+        clearTable();
+      }
+    }, 1500); // Adjust the debounce time in milliseconds as needed
+  });
+  
+  google.maps.event.addListener(map, "bounds_changed", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (map.getZoom() >= 15) {
+        populateTableWithVisibleStreets();
+      } else {
+        clearTable();
+      }
+    }, 1500); // Adjust the debounce time in milliseconds as needed
+  });
 
-google.maps.event.addListener(map, "bounds_changed", () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    if (map.getZoom() >= 15) {
-      populateTableWithVisibleStreets();
+  // Add click event listener to the map
+  map.addListener('click', async (event) => {
+  const clickedLatLng = event.latLng;
+  const streetViewService = new google.maps.StreetViewService();
+  streetViewService.getPanoramaByLocation(clickedLatLng, 50, (data, status) => {
+    if (status === google.maps.StreetViewStatus.OK) {
+      const imageDate = data.imageDate;
+      showPopup(clickedLatLng, imageDate, status);
     } else {
-      clearTable();
+      showPopup(clickedLatLng, null, status);
+      console.error('Error fetching Street View image date for clicked location:', status);
     }
-  }, 1500); // Adjust the debounce time in milliseconds as needed
+  });
 });
-
+  
 }
 
 function updateZoomLevelIndicator() {
@@ -217,6 +232,29 @@ async function fetchStreets(center, radius) {
 
   console.log(midPoints);
 }
+
+function showPopup(latLng, imageDate, status) {
+  // Close the existing InfoWindow if any
+  if (window.infoWindow) {
+    window.infoWindow.close();
+  }
+
+  // Set the content of the InfoWindow based on the availability of Street View data
+  const content = status === google.maps.StreetViewStatus.OK
+    ? `Street View image date: ${imageDate}`
+    : 'No Street View data available for this location';
+
+  // Create a new InfoWindow
+  window.infoWindow = new google.maps.InfoWindow({
+    content,
+    position: latLng,
+  });
+
+  // Open the InfoWindow at the clicked location
+  window.infoWindow.open(map);
+}
+
+
     
 
   </script>
