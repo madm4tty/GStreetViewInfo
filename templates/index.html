@@ -226,7 +226,6 @@ async function fetchStreets(center, radius) {
     width: 30%;
     float: right;
     overflow-y: auto;
-    
     background-color: #ECEFF1;
     box-sizing: border-box;
   }
@@ -244,15 +243,20 @@ async function fetchStreets(center, radius) {
 
   #description {
     width: 100%;
-    padding: 20px;
+    padding: 5px;
     text-align: left;
     background-color: #f8f9fa;
     font-size: 16px;
-    margin-top: 20px;
+    margin-top: 0px;
     margin-bottom: 20px;
     box-sizing: border-box;
   }
-
+    
+  .clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
 
   table {
     border-collapse: collapse;
@@ -285,21 +289,21 @@ async function fetchStreets(center, radius) {
   <!-- The table rows will be added dynamically -->
 	</table>
 	  </div>
-  
+  <div class="clearfix"></div>
   <div id="description">
     <p></p>
       <h3>Description</h3>
       <p>
-        The Google Maps Street View Image Date Web App is an interactive mapping application that displays street names in a specific area on the map and their corresponding latest Street View image date. The app allows users to zoom in and out of the map to explore different locations and obtain street-level imagery information. When the user zooms in at a certain level (zoom level 15 or higher), the app populates a table with visible street names and their latest Street View image date. Users can also click on the street name in the table to place a marker on the map, indicating the street's location.
+        Google Streetview Dates Viewer is an interactive mapping application that displays street names in a specific area on the map and their corresponding latest Street View image date. The app allows users to quickly see how up to date street-level imagery is for a given location without needing to enter a Streetview panorama view.
       </p>
       <h3>How to use:</h3>
       <ol>
         <li>Open the web app in your browser. You will see a Google Map view on the left side of the screen and an initially empty data table on the right side.</li>
-        <li>Use the mouse to navigate and scroll to zoom in and out of the map. When you reach zoom level 15 or higher, the app will automatically populate the data table with the visible street names and their latest Street View image date.</li>
+        <li>Navigate the map as desired. When you reach zoom level 15 or higher, the app will automatically populate the data table with the visible street names and their latest Street View image date.</li>
         <li>If there is no Street View imagery available for a specific street, the table will display "No imagery here" in the date column.</li>
-        <li>To view the location of a particular street on the map, click on the street name in the data table. A marker will appear on the map, indicating the street's location.</li>
-        <li>To clear the table and remove all markers from the map, zoom out to a level below 15. The table will display a message "Zoom in to see Street View data" indicating that you need to zoom in further to access Street Viewimage dates.</li>
-		<li>Explore different areas by panning and zooming the map. The data table will update automatically as you navigate, providing Street View image dates for streets in the visible area.</li>
+        <li>To view the location of a particular street on the map, click on the street name in the data table. A marker will appear on the map.</li>
+        <li>To clear the table and remove all markers from the map, zoom out.</li>
+		<li>As you pan and zoom the map, the data table will update automatically.</li>
 		</ol>
 		</div>
 	</body>
