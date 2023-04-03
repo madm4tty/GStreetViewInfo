@@ -17,7 +17,12 @@ function initMap() {
     zoom: 5,
   });
 
+// Display the initial zoom level
+  updateZoomLevelIndicator();
+
+  
 google.maps.event.addListener(map, "zoom_changed", () => {
+  updateZoomLevelIndicator(); //Update zoom level indicator
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
     if (map.getZoom() >= 15) {
@@ -41,6 +46,19 @@ google.maps.event.addListener(map, "bounds_changed", () => {
 
 }
 
+function updateZoomLevelIndicator() {
+  const zoomLevelElement = document.getElementById("zoom-level");
+  const zoomLevelContainer = document.getElementById("zoom-level-container");
+  const zoomLevel = map.getZoom();
+  zoomLevelElement.textContent = zoomLevel;
+
+  if (zoomLevel > 15) {
+    zoomLevelContainer.classList.add("hidden");
+  } else {
+    zoomLevelContainer.classList.remove("hidden");
+  }
+}
+    
 function populateTableWithVisibleStreets() {
   const bounds = map.getBounds();
   const northEast = bounds.getNorthEast();
@@ -214,11 +232,29 @@ async function fetchStreets(center, radius) {
     }
     
   #map {
+    position: relative;
     height: 70%;
     width: 70%;
     float: left;
     border: 2px solid #dddddd;
     box-sizing: border-box;
+  }
+
+  #zoom-level-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  
+  #zoom-level-container.hidden {
+    opacity: 0;
   }
 
   #info-table-container {
@@ -280,6 +316,9 @@ async function fetchStreets(center, radius) {
 <body onload="initMap()">
   <div id="header">Google Streetview Dates Viewer</div>
   <div id="map"></div>
+    <div id="zoom-level-container">Zoom Level: <span id="zoom-level"></span></div>
+  </div>
+  
   <div id="info-table-container">
 		<table id="info-table">
   <tr>
@@ -306,5 +345,6 @@ async function fetchStreets(center, radius) {
 		<li>As you pan and zoom the map, the data table will update automatically.</li>
 		</ol>
 		</div>
+
 	</body>
 	</html>
