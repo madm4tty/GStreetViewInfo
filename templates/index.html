@@ -231,31 +231,37 @@ async function fetchStreets(center, radius) {
       font-family: 'Roboto', sans-serif;
     }
     
-  #map {
-    position: relative;
-    height: 70%;
-    width: 70%;
-    float: left;
-    border: 2px solid #dddddd;
-    box-sizing: border-box;
-  }
+  #map-container {
+  position: relative;
+  height: 70%;
+  width: 70%;
+  float: left;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  #zoom-level-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    opacity: 1;
-    transition: opacity 0.5s ease;
-  }
-  
-  #zoom-level-container.hidden {
-    opacity: 0;
-  }
+#map {
+  height: 100%;
+  width: 100%;
+  border: 2px solid #dddddd;
+  box-sizing: border-box;
+}
+
+#zoom-level-container {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+#zoom-level-container.hidden {
+  opacity: 0;
+}
+
 
   #info-table-container {
     height: 70%;
@@ -315,7 +321,8 @@ async function fetchStreets(center, radius) {
 </head>
 <body onload="initMap()">
   <div id="header">Google Streetview Dates Viewer</div>
-  <div id="map"></div>
+  <div id="map-container">
+    <div id="map"></div>
     <div id="zoom-level-container">Zoom Level: <span id="zoom-level"></span></div>
   </div>
   
@@ -345,6 +352,5 @@ async function fetchStreets(center, radius) {
 		<li>As you pan and zoom the map, the data table will update automatically.</li>
 		</ol>
 		</div>
-
 	</body>
 	</html>
