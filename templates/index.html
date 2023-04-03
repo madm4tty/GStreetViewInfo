@@ -12,6 +12,8 @@
     let debounceTimer;
 
 function initMap() {
+  let clickTimeout; // Declare the timeout variable
+  let isDoubleClick = false; // Declare a flag to check if the event is a double-click
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 51.5098, lng: -0.1180 },
     zoom: 5,
@@ -46,18 +48,35 @@ function initMap() {
 
   // Add click event listener to the map
   map.addListener('click', async (event) => {
-  const clickedLatLng = event.latLng;
-  const streetViewService = new google.maps.StreetViewService();
-  streetViewService.getPanoramaByLocation(clickedLatLng, 50, (data, status) => {
-    if (status === google.maps.StreetViewStatus.OK) {
-      const imageDate = data.imageDate;
-      showPopup(clickedLatLng, imageDate, status);
-    } else {
-      showPopup(clickedLatLng, null, status);
-      console.error('Error fetching Street View image date for clicked location:', status);
-    }
+    clearTimeout(clickTimeout); // Clear the timeout
+
+    clickTimeout = setTimeout(async () => {
+      if (!isDoubleClick) {
+        const clickedLatLng = event.latLng;
+        const streetViewService = new google.maps.StreetViewService();
+        streetViewService.getPanoramaByLocation(clickedLatLng, 50, (data, status) => {
+          if (status === google.maps.StreetViewStatus.OK) {
+            const imageDate = data.imageDate;
+            showPopup(clickedLatLng, imageDate, status);
+          } else {
+            showPopup(clickedLatLng, null, status);
+            console.error('Error fetching Street View image date for clicked location:', status);
+          }
+        });
+      }
+    }, 300); // Set the timeout to 300 ms or any other value suitable for your use case
   });
-});
+
+  // Add dblclick event listener
+  map.addListener('dblclick', (event) => {
+    clearTimeout(clickTimeout); // Clear the timeout
+    isDoubleClick = true; // Set the flag to true
+
+    // Reset the flag after a short period
+    setTimeout(() => {
+      isDoubleClick = false;
+    }, 300); // Set the timeout to 300 ms or any other value suitable for your use case
+  });
   
 }
 
@@ -375,20 +394,22 @@ function showPopup(latLng, imageDate, status) {
 	  </div>
   <div class="clearfix"></div>
   <div id="description">
-    <p></p>
-      <h3>Description</h3>
-      <p>
-        Google Streetview Dates Viewer is an interactive mapping application that displays street names in a specific area on the map and their corresponding latest Street View image date. The app allows users to quickly see how up to date street-level imagery is for a given location without needing to enter a Streetview panorama view.
-      </p>
-      <h3>How to use:</h3>
-      <ol>
-        <li>Open the web app in your browser. You will see a Google Map view on the left side of the screen and an initially empty data table on the right side.</li>
-        <li>Navigate the map as desired. When you reach zoom level 15 or higher, the app will automatically populate the data table with the visible street names and their latest Street View image date.</li>
-        <li>If there is no Street View imagery available for a specific street, the table will display "No imagery here" in the date column.</li>
-        <li>To view the location of a particular street on the map, click on the street name in the data table. A marker will appear on the map.</li>
-        <li>To clear the table and remove all markers from the map, zoom out.</li>
-		<li>As you pan and zoom the map, the data table will update automatically.</li>
-		</ol>
-		</div>
+  <h3>Description</h3>
+  <p>
+    Google Streetview Dates Viewer is an interactive mapping application that displays street names in a specific area on the map and their corresponding latest Street View image date. The app allows users to quickly see how up to date street-level imagery is for a given location without needing to enter a Streetview panorama view. Additionally, users can click on a location on the map to view the Street View image date for that spot in a popup.
+  </p>
+  <h3>How to use:</h3>
+  <ol>
+    <li>Open the web app in your browser. You will see a Google Map view on the left side of the screen and an initially empty data table on the right side.</li>
+    <li>Navigate the map as desired. When you reach zoom level 15 or higher, the app will automatically populate the data table with the visible street names and their latest Street View image date.</li>
+    <li>If there is no Street View imagery available for a specific street, the table will display "No imagery here" in the date column.</li>
+    <li>To view the location of a particular street on the map, click on the street name in the data table. A marker will appear on the map.</li>
+    <li>Click on a location on the map to view the Street View image date for that spot in a popup. If there is no Street View imagery available for the clicked location, the popup will display "No imagery here".</li>
+    <li>Double-click on the map to zoom in without triggering the popup.</li>
+    <li>To clear the table and remove all markers from the map, zoom out.</li>
+    <li>As you pan and zoom the map, the data table will update automatically.</li>
+  </ol>
+</div>
+
 	</body>
 	</html>
