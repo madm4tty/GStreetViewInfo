@@ -201,24 +201,34 @@ async function populateRowWithStreetViewImageDate(row, streetName) {
 
 
 
-async function geocodeStreet(streetName, apiKey) {
+async function geocodeStreet(streetName, apiKey, maxRetries = 5, retryDelay = 500) {
   const geocoder = new google.maps.Geocoder();
   const request = {
     address: streetName,
     bounds: map.getBounds(),
   };
 
-  return new Promise((resolve, reject) => {
+  const geocodeWithRetry = (resolve, reject, retriesRemaining, delay) => {
     geocoder.geocode(request, (results, status) => {
       if (status === "OK") {
         const latLng = results[0].geometry.location;
         resolve({ lat: latLng.lat(), lng: latLng.lng() });
+      } else if (status === "OVER_QUERY_LIMIT" && retriesRemaining > 0) {
+        // Apply exponential backoff
+        setTimeout(() => {
+          geocodeWithRetry(resolve, reject, retriesRemaining - 1, delay * 2);
+        }, delay);
       } else {
         reject(new Error(`Geocoding failed for ${streetName}: ${status}`));
       }
     });
+  };
+
+  return new Promise((resolve, reject) => {
+    geocodeWithRetry(resolve, reject, maxRetries, retryDelay);
   });
 }
+
 
 
     
