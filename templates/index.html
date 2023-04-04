@@ -77,6 +77,14 @@ function initMap() {
       isDoubleClick = false;
     }, 300); // Set the timeout to 300 ms or any other value suitable for your use case
   });
+
+  const searchBox = document.getElementById("search-box");
+  searchBox.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      searchLocation(searchBox.value);
+    }
+  });
+
   
 }
 
@@ -273,6 +281,24 @@ function showPopup(latLng, imageDate, status) {
   window.infoWindow.open(map);
 }
 
+async function searchLocation(location) {
+  try {
+    const geocoder = new google.maps.Geocoder();
+    const request = { address: location };
+
+    geocoder.geocode(request, (results, status) => {
+      if (status === "OK") {
+        const latLng = results[0].geometry.location;
+        map.setCenter({ lat: latLng.lat(), lng: latLng.lng() });
+        map.setZoom(17);
+      } else {
+        console.error(`Search failed for ${location}: ${status}`);
+      }
+    });
+  } catch (error) {
+    console.error(`Error searching for ${location}:`, error);
+  }
+}
 
     
 
@@ -289,39 +315,53 @@ function showPopup(latLng, imageDate, status) {
     }
     
   #map-container {
-  position: relative;
-  height: 70%;
-  width: 70%;
-  float: left;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    position: relative;
+    height: 90%;
+    width: 70%;
+    float: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-#map {
-  height: 100%;
-  width: 100%;
-  border: 2px solid #dddddd;
-  box-sizing: border-box;
-}
-
-#zoom-level-container {
-  position: absolute;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  opacity: 1;
-  transition: opacity 0.5s ease;
-}
-
-#zoom-level-container.hidden {
-  opacity: 0;
-}
-
+  #map {
+    height: 100%;
+    width: 100%;
+    border: 2px solid #dddddd;
+    box-sizing: border-box;
+  }
+  
+  #zoom-level-container {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  
+  #zoom-level-container.hidden {
+    opacity: 0;
+  }
+    
+  #search-container {
+    width: 30%;
+    float: right;
+    margin-bottom: 1px;
+    box-sizing: border-box;
+    padding: 0px;
+  }
+  
+  #search-box {
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
 
   #info-table-container {
-    height: 70%;
+    height: 85%;
     width: 30%;
     float: right;
     overflow-y: auto;
@@ -382,7 +422,9 @@ function showPopup(latLng, imageDate, status) {
     <div id="map"></div>
     <div id="zoom-level-container">Zoom Level: <span id="zoom-level"></span></div>
   </div>
-  
+  <div id="search-container">
+    <input id="search-box" type="text" placeholder="Search for a location">
+  </div>
   <div id="info-table-container">
 		<table id="info-table">
   <tr>
