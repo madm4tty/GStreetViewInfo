@@ -78,6 +78,9 @@ function initMap() {
     }, 300); // Set the timeout to 300 ms or any other value suitable for your use case
   });
 
+  document.getElementById('toggle-pois').addEventListener('click', togglePOIs);
+
+  
   const searchBox = document.getElementById("search-box");
   searchBox.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -310,7 +313,21 @@ async function searchLocation(location) {
   }
 }
 
-    
+ function togglePOIs() {
+  const currentStyles = map.get('styles');
+  const newStyles = currentStyles
+    ? null
+    : [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }],
+        },
+      ];
+
+  map.set('styles', newStyles);
+}
+   
 
   </script>
   <style>
@@ -426,6 +443,34 @@ async function searchLocation(location) {
   th {
     background-color: #CFD8DC;
   }
+
+  #control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #control-panel button {
+    font-size: 14px;
+    border: none;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  #control-panel button:hover {
+    background-color: #dddddd;
+  }
+
+
+    
 </style>
 
 </head>
@@ -433,6 +478,10 @@ async function searchLocation(location) {
   <div id="header">Google Streetview Dates Viewer</div>
   <div id="main-container">
     <div id="map-container">
+      <div id="control-panel">
+        <button id="toggle-pois">Toggle POIs</button>
+      </div>
+
       <div id="map"></div>
       <div id="zoom-level-container">Zoom Level: <span id="zoom-level"></span></div>
     </div>
