@@ -314,11 +314,14 @@ async function searchLocation(location) {
       font-family: 'Roboto', sans-serif;
     }
     
+  #main-container {
+  display: flex;
+  height: 90%;
+  }
+
   #map-container {
-    position: relative;
-    height: 90%;
-    width: 70%;
-    float: left;
+    flex: 1;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -347,10 +350,11 @@ async function searchLocation(location) {
     
   #search-container {
     width: 30%;
-    float: right;
     margin-bottom: 1px;
     box-sizing: border-box;
     padding: 0px;
+    display: flex;
+    flex-direction: column;
   }
   
   #search-box {
@@ -361,12 +365,11 @@ async function searchLocation(location) {
   }
 
   #info-table-container {
-    height: 85%;
-    width: 30%;
-    float: right;
-    overflow-y: auto;
-    background-color: #ECEFF1;
-    box-sizing: border-box;
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  background-color: #ECEFF1;
+  box-sizing: border-box;
   }
 
   #header {
@@ -418,22 +421,24 @@ async function searchLocation(location) {
 </head>
 <body onload="initMap()">
   <div id="header">Google Streetview Dates Viewer</div>
-  <div id="map-container">
-    <div id="map"></div>
-    <div id="zoom-level-container">Zoom Level: <span id="zoom-level"></span></div>
+  <div id="main-container">
+    <div id="map-container">
+      <div id="map"></div>
+      <div id="zoom-level-container">Zoom Level: <span id="zoom-level"></span></div>
+    </div>
+    <div id="search-container">
+      <input id="search-box" type="text" placeholder="Search for a location">
+      <div id="info-table-container">
+        <table id="info-table">
+          <tr>
+            <th>Name</th>
+            <th>Date</th>
+          </tr>
+          <!-- The table rows will be added dynamically -->
+        </table>
+      </div>
+    </div>
   </div>
-  <div id="search-container">
-    <input id="search-box" type="text" placeholder="Search for a location">
-  </div>
-  <div id="info-table-container">
-		<table id="info-table">
-  <tr>
-    <th>Name</th>
-    <th>Date</th>
-  </tr>
-  <!-- The table rows will be added dynamically -->
-	</table>
-	  </div>
   <div class="clearfix"></div>
   <div id="description">
   <h3>Description</h3>
