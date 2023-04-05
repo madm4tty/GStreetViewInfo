@@ -166,10 +166,14 @@ async function populateTable(streetNames) {
           map: map,
         });
 
-        // Center the map on the marker
-        //map.setCenter(latLng);
+        // Ensure the marker is within the current map view
+        if (!map.getBounds().contains(latLng)) {
+          // Center the map on the marker
+          map.setCenter(latLng);
+        }
+
       } catch (error) {
-		console.error(`Error placing marker for ${streetName}:`, error);
+        console.error(`Error placing marker for ${streetName}:`, error);
       }
     });
 
