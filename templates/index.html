@@ -167,7 +167,7 @@ async function populateTable(streetNames) {
         });
 
         // Center the map on the marker
-        map.setCenter(latLng);
+        //map.setCenter(latLng);
       } catch (error) {
 		console.error(`Error placing marker for ${streetName}:`, error);
       }
@@ -182,13 +182,13 @@ async function populateTable(streetNames) {
 
 
 async function populateRowWithStreetViewImageDate(row, streetName) {
-  await sleep(250); // Adjust the delay as needed (500 milliseconds in this example)
+  await sleep(200); // Adjust the delay as needed (500 milliseconds in this example)
   try {
     const streetLatLng = await geocodeStreet(streetName);
     const latLng = new google.maps.LatLng(streetLatLng.lat, streetLatLng.lng);
 
     const streetViewService = new google.maps.StreetViewService();
-    streetViewService.getPanoramaByLocation(latLng, 50, (data, status) => {
+    streetViewService.getPanoramaByLocation(latLng, 30, (data, status) => {
       if (status === google.maps.StreetViewStatus.OK) {
         const imageDate = data.imageDate;
         const cell2 = row.insertCell(1);
@@ -247,7 +247,7 @@ function clearTable() {
     // Add a message when zoom level is below 17
     const row = table.insertRow();
     const cell = row.insertCell();
-    cell.textContent = "Zoom in to see Streetview data";
+    cell.textContent = "Zoom in (level 17 or more) to see data!";
     cell.colSpan = 2; // Span the message across both columns
     cell.style.textAlign = "center";
   }
