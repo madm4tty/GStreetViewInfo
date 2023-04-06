@@ -137,19 +137,37 @@
   }
 
   #progress-container {
-    position: relative;
-    margin-bottom: 10px;
-  }
-  
-  #progress-bar {
-    width: 100%;
-    height: 10px;
-  }
-  
-  #progress-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.8em;
-  }
+  position: relative;
+}
+
+#progress-bar {
+  width: 100%;
+  height: 20px; /* Change this value to increase or decrease the thickness */
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background-color: #f3f3f3; /* Customize the progress bar color */
+}
+
+#progress-bar::-webkit-progress-bar {
+  background-color: #f3f3f3;
+  border-radius: 0;
+}
+
+#progress-bar::-webkit-progress-value {
+  background-color: #4CAF50;
+  border-radius: 0;
+}
+
+#progress-bar::-moz-progress-bar {
+  background-color: #4CAF50;
+  border-radius: 0;
+}
+
+#progress-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
