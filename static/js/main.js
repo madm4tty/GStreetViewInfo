@@ -116,6 +116,8 @@ function populateTableWithVisibleStreets() {
         .filter((element) => element.tags && element.tags.name)
         .map((element) => element.tags.name);
       const uniqueStreetNames = [...new Set(streetNames)];
+      // Sort the street names alphabetically
+      uniqueStreetNames.sort();
       populateTable(uniqueStreetNames, '{{ google_maps_api_key }}'); // Pass the API key as a string
     })
     .catch((error) => {
