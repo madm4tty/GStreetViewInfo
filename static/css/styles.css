@@ -135,3 +135,21 @@
   #control-panel button:hover {
     background-color: #dddddd;
   }
+
+  #progress-container {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  
+  #progress-bar {
+    width: 100%;
+    height: 10px;
+  }
+  
+  #progress-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8em;
+  }

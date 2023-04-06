@@ -94,7 +94,9 @@ function updateZoomLevelIndicator() {
   }
 }
     
-function populateTableWithVisibleStreets() {
+async function populateTableWithVisibleStreets() {
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
   const bounds = map.getBounds();
   const northEast = bounds.getNorthEast();
   const southWest = bounds.getSouthWest();
@@ -110,24 +112,33 @@ function populateTableWithVisibleStreets() {
   const overpassApiUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery.trim())}`;
 
   fetch(overpassApiUrl)
-    .then((response) => response.json())
+    .then((response) => {
+      // Reset progress bar
+      progressBar.value = 0;
+      progressText.innerText = "populating table...";
+      return response.json();
+    })
     .then((data) => {
       const streetNames = data.elements
         .filter((element) => element.tags && element.tags.name)
         .map((element) => element.tags.name);
       const uniqueStreetNames = [...new Set(streetNames)];
-      // Sort the street names alphabetically
       uniqueStreetNames.sort();
-      populateTable(uniqueStreetNames, '{{ google_maps_api_key }}'); // Pass the API key as a string
+
+      // Calculate the increment for each street in the progress bar
+      const increment = 100 / uniqueStreetNames.length;
+
+      populateTable(uniqueStreetNames, increment);
     })
     .catch((error) => {
       console.error('Error fetching street names:', error);
     });
-
 }
 
 
-async function populateTable(streetNames) {
+async function populateTable(streetNames, increment) {
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
   const table = document.getElementById("info-table");
 
   // Clear the table before populating it
@@ -172,10 +183,13 @@ async function populateTable(streetNames) {
     // Fetch and display the Street View image date
     await populateRowWithStreetViewImageDate(row, streetName);
 
+    // Update the progress bar
+    progressBar.value += increment;
   }
+
+  progressBar.value = 100;
+  progressText.innerText = "complete";
 }
-
-
 
 async function populateRowWithStreetViewImageDate(row, streetName) {
   try {
