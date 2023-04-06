@@ -79,6 +79,8 @@ function initMap() {
   });
 
   
+  // Initialize the progress bar with 0% complete
+  updateProgressBar(0);
 }
 
 function updateZoomLevelIndicator() {
@@ -135,6 +137,17 @@ async function populateTable(streetNames) {
     table.deleteRow(1);
   }
 
+  // Create the loading message and progress bar
+  const loadingRow = table.insertRow();
+  const loadingCell = loadingRow.insertCell();
+  loadingCell.colSpan = 2;
+  loadingCell.textContent = "Loading StreetView data...";
+  loadingCell.id = "loading-cell";
+  loadingCell.style.backgroundImage = "linear-gradient(to right, #99c7fd 0%, #99c7fd 0%, transparent 0%, transparent 100%)";
+
+  const totalStreets = streetNames.length;
+  let completedStreets = 0;
+
   for (const streetName of streetNames) {
     const row = table.insertRow();
     const cell1 = row.insertCell();
@@ -171,8 +184,12 @@ async function populateTable(streetNames) {
 
     // Fetch and display the Street View image date
     await populateRowWithStreetViewImageDate(row, streetName);
-
+    completedStreets += 1;
+    updateProgressBar((completedStreets / totalStreets) * 100);
   }
+
+  // Remove the loading message and progress bar after completion
+  table.deleteRow(0);
 }
 
 
@@ -324,4 +341,18 @@ async function searchLocation(location) {
    
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function updateProgressBar(percentage) {
+  const loadingCell = document.getElementById("loading-cell");
+  if (loadingCell) {
+    loadingCell.style.backgroundImage = `linear-gradient(to right, #99c7fd 0%, #99c7fd ${percentage}%, transparent ${percentage}%, transparent 100%)`;
+
+    if (percentage === 100) {
+      loadingCell.textContent = "Completed";
+      loadingCell.style.backgroundImage = ""; // Remove the progress bar background
+    } else {
+      loadingCell.textContent = "Loading StreetView data...";
+    }
+  }
 }
