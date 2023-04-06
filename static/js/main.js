@@ -44,7 +44,7 @@ function initMap() {
       if (!isDoubleClick) {
         const clickedLatLng = event.latLng;
         const streetViewService = new google.maps.StreetViewService();
-        streetViewService.getPanoramaByLocation(clickedLatLng, 50, (data, status) => {
+        streetViewService.getPanoramaByLocation(clickedLatLng, 20, (data, status) => {
           if (status === google.maps.StreetViewStatus.OK) {
             const imageDate = data.imageDate;
             showPopup(clickedLatLng, imageDate, status);
@@ -178,11 +178,9 @@ async function populateTable(streetNames) {
 
 
 async function populateRowWithStreetViewImageDate(row, streetName) {
-  await sleep(200); // Adjust the delay as needed (500 milliseconds in this example)
   try {
     const streetLatLng = await geocodeStreet(streetName);
     const latLng = new google.maps.LatLng(streetLatLng.lat, streetLatLng.lng);
-
     const streetViewService = new google.maps.StreetViewService();
     streetViewService.getPanoramaByLocation(latLng, 30, (data, status) => {
       if (status === google.maps.StreetViewStatus.OK) {
@@ -202,7 +200,7 @@ async function populateRowWithStreetViewImageDate(row, streetName) {
 
 
 
-async function geocodeStreet(streetName, apiKey, maxRetries = 5, retryDelay = 200) {
+async function geocodeStreet(streetName, apiKey, maxRetries = 5, retryDelay = 250) {
   const geocoder = new google.maps.Geocoder();
   const request = {
     address: streetName,
