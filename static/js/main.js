@@ -44,7 +44,7 @@ function initMap() {
       if (!isDoubleClick) {
         const clickedLatLng = event.latLng;
         const streetViewService = new google.maps.StreetViewService();
-        streetViewService.getPanoramaByLocation(clickedLatLng, 20, (data, status) => {
+        streetViewService.getPanoramaByLocation(clickedLatLng, 30, (data, status) => {
           if (status === google.maps.StreetViewStatus.OK) {
             const imageDate = data.imageDate;
             showPopup(clickedLatLng, imageDate, status);
@@ -79,8 +79,6 @@ function initMap() {
   });
 
   
-  // Initialize the progress bar with 0% complete
-  updateProgressBar(0);
 }
 
 function updateZoomLevelIndicator() {
@@ -137,17 +135,6 @@ async function populateTable(streetNames) {
     table.deleteRow(1);
   }
 
-  // Create the loading message and progress bar
-  const loadingRow = table.insertRow();
-  const loadingCell = loadingRow.insertCell();
-  loadingCell.colSpan = 2;
-  loadingCell.textContent = "Loading StreetView data...";
-  loadingCell.id = "loading-cell";
-  loadingCell.style.backgroundImage = "linear-gradient(to right, #99c7fd 0%, #99c7fd 0%, transparent 0%, transparent 100%)";
-
-  const totalStreets = streetNames.length;
-  let completedStreets = 0;
-
   for (const streetName of streetNames) {
     const row = table.insertRow();
     const cell1 = row.insertCell();
@@ -184,12 +171,8 @@ async function populateTable(streetNames) {
 
     // Fetch and display the Street View image date
     await populateRowWithStreetViewImageDate(row, streetName);
-    completedStreets += 1;
-    updateProgressBar((completedStreets / totalStreets) * 100);
-  }
 
-  // Remove the loading message and progress bar after completion
-  table.deleteRow(0);
+  }
 }
 
 
@@ -199,7 +182,7 @@ async function populateRowWithStreetViewImageDate(row, streetName) {
     const streetLatLng = await geocodeStreet(streetName);
     const latLng = new google.maps.LatLng(streetLatLng.lat, streetLatLng.lng);
     const streetViewService = new google.maps.StreetViewService();
-    streetViewService.getPanoramaByLocation(latLng, 30, (data, status) => {
+    streetViewService.getPanoramaByLocation(latLng, 20, (data, status) => {
       if (status === google.maps.StreetViewStatus.OK) {
         const imageDate = data.imageDate;
         const cell2 = row.insertCell(1);
@@ -341,18 +324,4 @@ async function searchLocation(location) {
    
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function updateProgressBar(percentage) {
-  const loadingCell = document.getElementById("loading-cell");
-  if (loadingCell) {
-    loadingCell.style.backgroundImage = `linear-gradient(to right, #99c7fd 0%, #99c7fd ${percentage}%, transparent ${percentage}%, transparent 100%)`;
-
-    if (percentage === 100) {
-      loadingCell.textContent = "Completed";
-      loadingCell.style.backgroundImage = ""; // Remove the progress bar background
-    } else {
-      loadingCell.textContent = "Loading StreetView data...";
-    }
-  }
 }
