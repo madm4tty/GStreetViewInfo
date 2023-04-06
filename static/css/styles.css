@@ -62,17 +62,19 @@
   flex: 1;
   width: 100%;
   overflow-y: auto;
-  background-color: #ECEFF1;
+  background-color: #35363a;
   box-sizing: border-box;
+  color: #ffffff;
   }
 
   #header {
     width: 100%;
     padding: 20px;
     text-align: left;
-    background-color: #ECEFF1;
+    background-color: #35363a;
     font-size: 30px;
     font-weight: bold;
+    color: #ffffff;
     margin-bottom: 0px;
     box-sizing: border-box;
   }
@@ -81,11 +83,12 @@
     width: 100%;
     padding: 5px;
     text-align: left;
-    background-color: #f8f9fa;
+    background-color: #35363a;
     font-size: 16px;
     margin-top: 0px;
     margin-bottom: 20px;
     box-sizing: border-box;
+    color: #ffffff;
   }
     
   .clearfix::after {
@@ -104,11 +107,13 @@
     border: 2px solid #dddddd;
     text-align: left;
     padding: 8px;
-    background-color: #CFD8DC
+    background-color: #35363a
+    color: #ffffff;
   }
 
   th {
-    background-color: #CFD8DC;
+    background-color: #35363a;
+    color: #ffffff;
   }
 
   #control-panel {
@@ -125,15 +130,15 @@
   #control-panel button {
     font-size: 14px;
     border: none;
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #35363a;
+    color: #ffffff;
     padding: 5px;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
   }
   
   #control-panel button:hover {
-    background-color: #dddddd;
+    background-color: #35363a;
   }
 
   #progress-container {
@@ -142,27 +147,32 @@
 
 #progress-bar {
   width: 100%;
-  height: 20px; /* Change this value to increase or decrease the thickness */
+  height: 15px;
   -webkit-appearance: none;
   appearance: none;
   border: none;
-  background-color: #f3f3f3; /* Customize the progress bar color */
+  background-color: #35363a;
+}
+
+#progress-bar[data-bgcolor] {
+  background-color: #4dff00;
 }
 
 #progress-bar::-webkit-progress-bar {
-  background-color: #f3f3f3;
+  background-color: #35363a;
   border-radius: 0;
 }
 
 #progress-bar::-webkit-progress-value {
-  background-color: #4CAF50;
+  background-color: #355ec0;
   border-radius: 0;
 }
 
 #progress-bar::-moz-progress-bar {
-  background-color: #4CAF50;
+  background-color: #355ec0;
   border-radius: 0;
 }
+
 
 #progress-text {
   position: absolute;
@@ -170,4 +180,5 @@
   top: 50%;
   transform: translate(-50%, -50%);
   font-size: 0.8em;
+  color: #ffffff;
 }

@@ -78,7 +78,7 @@ function initMap() {
     }
   });
 
-  
+  document.getElementById("progress-text").style.display = "none";
 }
 
 function updateZoomLevelIndicator() {
@@ -95,6 +95,7 @@ function updateZoomLevelIndicator() {
 }
     
 async function populateTableWithVisibleStreets() {
+  document.getElementById("progress-text").style.display = "block";
   const progressBar = document.getElementById("progress-bar");
   const progressText = document.getElementById("progress-text");
   const bounds = map.getBounds();
@@ -115,7 +116,7 @@ async function populateTableWithVisibleStreets() {
     .then((response) => {
       // Reset progress bar
       progressBar.value = 0;
-      progressText.innerText = "populating table...";
+      progressText.innerText = "Populating table...";
       return response.json();
     })
     .then((data) => {
@@ -188,7 +189,12 @@ async function populateTable(streetNames, increment) {
   }
 
   progressBar.value = 100;
-  progressText.innerText = "complete";
+progressText.innerText = "complete!";
+await sleep(1000);
+document.getElementById("progress-text").style.display = "none";
+progressBar.removeAttribute('data-bgcolor');
+progressBar.value = 0;
+
 }
 
 async function populateRowWithStreetViewImageDate(row, streetName) {
