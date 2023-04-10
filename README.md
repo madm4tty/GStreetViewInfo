@@ -2,7 +2,7 @@
 
 Google Street View Info is an interactive mapping application that displays street names and their corresponding Street View image date. Quickly see how up to date street-level imagery is for a given location without needing to enter a Streetview panorama view.
 
-![Google Street View Info Screenshot](screenshot.png)
+![Google Street View Info Screenshot](https://github.com/madm4tty/GStreetViewInfo/blob/main/gstreetinfo.PNG)
 
 ## Features
 
