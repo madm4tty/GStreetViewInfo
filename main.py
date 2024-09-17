@@ -4,6 +4,8 @@ import os
 app = Flask(__name__)
 google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
 
+# Print the API key to the terminal
+print(f"Google Maps API Key: {google_maps_api_key}")
 
 @app.route('/')
 def index():
