@@ -1,4 +1,4 @@
-# [Google Street View Info](https://gstreetviewinfo.madm4tty.repl.co/)
+# Google Street View Info
 
 Google Street View Info is an interactive mapping application that displays street names and their corresponding Street View image date. Quickly see how up to date street-level imagery is for a given location without needing to enter a Streetview panorama view.
 
