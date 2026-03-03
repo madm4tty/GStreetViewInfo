@@ -1,5 +1,9 @@
 let map;
 let debounceTimer;
+let currentStreetMarker = null;
+let currentInfoWindow = null;
+
+const SEARCH_MAX_LENGTH = 500;
 
 function initMap() {
   let clickTimeout; // Declare the timeout variable
@@ -72,9 +76,13 @@ function initMap() {
 
   
   const searchBox = document.getElementById("search-box");
+  searchBox.setAttribute("maxlength", SEARCH_MAX_LENGTH);
   searchBox.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      searchLocation(searchBox.value);
+      const query = searchBox.value.trim();
+      if (query.length > 0 && query.length <= SEARCH_MAX_LENGTH) {
+        searchLocation(query);
+      }
     }
   });
 
@@ -114,12 +122,18 @@ async function populateTableWithVisibleStreets() {
 
   fetch(overpassApiUrl)
     .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Overpass API returned status ${response.status}`);
+      }
       // Reset progress bar
       progressBar.value = 0;
       progressText.innerText = "Populating table...";
       return response.json();
     })
     .then((data) => {
+      if (!data || !Array.isArray(data.elements)) {
+        throw new Error("Unexpected response format from Overpass API");
+      }
       const streetNames = data.elements
         .filter((element) => element.tags && element.tags.name)
         .map((element) => element.tags.name);
@@ -160,12 +174,12 @@ async function populateTable(streetNames, increment) {
         const latLng = new google.maps.LatLng(streetLatLng.lat, streetLatLng.lng);
 
         // Remove existing marker if any
-        if (window.streetMarker) {
-          window.streetMarker.setMap(null);
+        if (currentStreetMarker) {
+          currentStreetMarker.setMap(null);
         }
 
         // Create and place a new marker on the map
-        window.streetMarker = new google.maps.Marker({
+        currentStreetMarker = new google.maps.Marker({
           position: latLng,
           map: map,
         });
@@ -267,30 +281,10 @@ function clearTable() {
   }
 }
 
-async function fetchStreets(center, radius) {
-  const overpassApiUrl = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:25];(way[highway](around:${radius},${center.lat()},${center.lng()}));(._;>;);out body;`;
-  const response = await fetch(overpassApiUrl);
-  const data = await response.json();
-  const streets = data.elements.filter(element => element.type === "way");
-  const nodes = data.elements.filter(element => element.type === "node");
-
-  const midPoints = streets.map(street => {
-    const streetNodes = street.nodes.map(nodeId => nodes.find(node => node.id === nodeId));
-    const midIndex = Math.floor((streetNodes.length - 1) / 2);
-    const midPoint = {
-      lat: streetNodes[midIndex].lat,
-      lon: streetNodes[midIndex].lon
-    };
-    return midPoint;
-  });
-
-  console.log(midPoints);
-}
-
 function showPopup(latLng, imageDate, status) {
   // Close the existing InfoWindow if any
-  if (window.infoWindow) {
-    window.infoWindow.close();
+  if (currentInfoWindow) {
+    currentInfoWindow.close();
   }
 
   // Set the content of the InfoWindow based on the availability of Street View data
@@ -299,13 +293,13 @@ function showPopup(latLng, imageDate, status) {
     : 'No Street View data available for this location';
 
   // Create a new InfoWindow
-  window.infoWindow = new google.maps.InfoWindow({
+  currentInfoWindow = new google.maps.InfoWindow({
     content,
     position: latLng,
   });
 
   // Open the InfoWindow at the clicked location
-  window.infoWindow.open(map);
+  currentInfoWindow.open(map);
 }
 
 async function searchLocation(location) {
